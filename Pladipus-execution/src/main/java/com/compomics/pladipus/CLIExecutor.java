@@ -3,7 +3,6 @@ package com.compomics.pladipus;
 import com.compomics.pladipus.core.control.distribution.PladipusTrafficManager;
 import com.compomics.pladipus.core.control.distribution.service.RunService;
 import com.compomics.pladipus.core.control.distribution.service.UserService;
-import com.compomics.pladipus.core.control.distribution.service.queue.CompomicsQueueConnectionFactory;
 import com.compomics.pladipus.core.model.properties.NetworkProperties;
 import com.compomics.pladipus.util.ProcessAction;
 import com.compomics.pladipus.util.RunAction;
@@ -11,7 +10,6 @@ import com.compomics.pladipus.view.MainGUI;
 import java.io.Console;
 import java.io.File;
 import java.io.UnsupportedEncodingException;
-import java.net.UnknownHostException;
 import java.sql.SQLException;
 import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.CommandLineParser;
@@ -69,10 +67,6 @@ public class CLIExecutor {
      */
     private static boolean auto_start = false;
     /**
-     * the default run priority
-     */
-    private static int priority = 4;
-    /**
      * the PladipusTrafficManager instance
      */
     private static final PladipusTrafficManager trafficManager = PladipusTrafficManager.getInstance();
@@ -83,7 +77,7 @@ public class CLIExecutor {
             MainGUI.main(args);
         } else {
             while (true) {
-                //check if this is the firt time pladipus is run...
+                //check if this is the first time pladipus is run...
                 File firstRunFile = new File(System.getProperty("user.home") + "/pladipus/config");
                 if (!firstRunFile.exists()) {
                     NetworkProperties.getInstance();
@@ -134,7 +128,7 @@ public class CLIExecutor {
             } else if (uService.verifyUser(user, password)) {
                 accept = true;
             } else {
-                throw new SecurityException(user + " is not a authorized to push jobs !");
+                throw new SecurityException(user + " is not authorized to push jobs !");
             }
         } catch (SQLException | UnsupportedEncodingException ex) {
             LOGGER.error(ex);
@@ -164,6 +158,7 @@ public class CLIExecutor {
             if (line.hasOption("help")) {
                 HelpFormatter formatter = new HelpFormatter();
                 formatter.printHelp("LyraPolicy", options);
+                System.exit(0);
             }
             //verify the user
             if (line.hasOption("u")) {
@@ -262,9 +257,9 @@ public class CLIExecutor {
     private static void constructOptions() {
         //options
         options = new Options();
-        options.addOption(new Option("help", "prints help message"));
-        options.addOption(new Option("u", true, "pladipus user"));
-        options.addOption(new Option("p", true, "pladipus password"));
+        options.addOption(new Option("h", "help", false, "Prints help message"));
+        options.addOption(new Option("u", "user", true, "Pladipus user"));
+        options.addOption(new Option("p", true, "Pladipus password"));
         //pushing options
         options.addOption(new Option("template", true, "The template XML file to generate jobs with"));
         options.addOption(new Option("job_config", true, "The TSV file containing tab separated parameters (one job per line)"));
