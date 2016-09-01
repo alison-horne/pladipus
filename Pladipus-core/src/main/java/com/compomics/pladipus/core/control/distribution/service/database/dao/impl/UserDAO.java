@@ -57,7 +57,7 @@ public class UserDAO extends PladipusDAO implements AutoCloseable {
         try (AutoCloseableDBConnection c = new AutoCloseableDBConnection(false);
                 PreparedStatement queryUser = c.prepareStatement("SELECT user_name FROM users WHERE user_name=?");
                 PreparedStatement updateUser = c.prepareStatement("INSERT INTO users(user_name,password,contact) VALUES(?,?,?)", Statement.RETURN_GENERATED_KEYS);
-                PreparedStatement updateUserRole = c.prepareStatement("INSERT INTO user_roles(user_id,role_id) VALUES(?,?)", Statement.RETURN_GENERATED_KEYS)) {
+                PreparedStatement updateUserRole = c.prepareStatement("INSERT INTO user_roles(user_id,role_id) VALUES(?,?)")) {
             
             queryUser.setString(1, user);
 
@@ -70,6 +70,7 @@ public class UserDAO extends PladipusDAO implements AutoCloseable {
                 if (rs.next()) {
                     updateUserRole.setInt(1, rs.getInt(1));
                     updateUserRole.setInt(2, 2);
+                    updateUserRole.executeUpdate();
                     created = true;
                 } else {
                     created = false;
